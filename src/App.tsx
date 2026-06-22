@@ -35,7 +35,7 @@ function App() {
         // Initialization Function
         const init = async () => {
             const pixiApp = new Application();
-            await pixiApp.init({ background: '#1099bb' });
+            await pixiApp.init({ background: '#000000' });
 
             if (cancelled) {
                 // Return if the component has been unmounted before initialization is complete.
