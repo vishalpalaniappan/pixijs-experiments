@@ -7,7 +7,7 @@ import TerserPlugin from "terser-webpack-plugin";
 export default (_env, argv) => {
   return {
     stats: "minimal", // Keep console output easy to read.
-    entry: "./src/main.ts", // Your program entry point
+    entry: "./src/main.tsx", // Your program entry point
 
     // Your build destination
     output: {
