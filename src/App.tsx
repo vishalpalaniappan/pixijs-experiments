@@ -1,7 +1,8 @@
 import React from 'react';
 import { useEffect, useRef } from 'react';
 import { Application } from 'pixi.js';
-import { bunnyRotate } from './examples/BunnyRotate';
+// import { bunnyRotate } from './examples/BunnyRotate';
+import { hello_there } from './examples/hello_there';
 import './app.scss';
 
 /**
@@ -56,7 +57,8 @@ function App() {
             app = pixiApp;
             containerRef.current?.appendChild(app.canvas);
             app.resizeTo = containerRef.current!;
-            await bunnyRotate(app);
+            // await bunnyRotate(app);
+            await hello_there(app);
             app.render();
         };
         init();
