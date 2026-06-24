@@ -1,17 +1,25 @@
 import { Assets, Application, Sprite, Text } from 'pixi.js';
-import { gsap } from 'gsap';
-import { Howl } from 'howler';
+import { getProject } from '@theatre/core';
+import studio from '@theatre/studio';
+import animation from './animation.json';
 
 export const bunnyRotate = async (app: Application): Promise<void> => {
+    studio.initialize();
+
+    const project = getProject('My Project', {
+        state: animation,
+    });
+    const sheet = project.sheet('Scene');
+
+    await sheet.sequence.attachAudio({
+        source: '/assets/count.mp3',
+    });
+
     const texture = await Assets.load('/assets/bunny.png');
     const bunny = new Sprite(texture);
 
-    const sound = new Howl({
-        src: ['/assets/count.mp3'],
-    });
-
     const text = new Text({
-        text: 'Click bunny to play!',
+        text: 'Press space to play/pause the animation',
         style: {
             fontSize: 18,
             fill: 0xffffff,
@@ -27,53 +35,31 @@ export const bunnyRotate = async (app: Application): Promise<void> => {
 
     bunny.position.set(100, app.screen.height / 2);
 
-    const timeline = gsap.timeline({
-        paused: true,
-        onComplete: () => {
-            console.log('Timeline finished');
-            sound.stop();
-        },
-        onUpdate: () => {
-            console.log('Time:', timeline.time());
-            text.text = timeline.time() + '/10 seconds';
-            if (timeline.time() >= timeline.duration()) {
-                sound.stop();
-                timeline.pause(0);
-                bunny.eventMode = 'static';
-                text.text = 'Click bunny to play!';
-            }
-        },
+    const bunnyObj = sheet.object('Bunny', {
+        x: bunny.x,
+        y: bunny.y,
+        rotation: bunny.rotation,
+        scale: bunny.scale.x,
     });
 
-    timeline
-        .to(bunny, { x: 200, duration: 2 })
-        .to(bunny, { x: 400, duration: 2 })
-        .to(bunny, { x: 600, duration: 2 })
-        .to(bunny, { x: 800, duration: 2 })
-        .to(bunny, { x: 1000, duration: 2 });
-
-    bunny.eventMode = 'static';
-    bunny.cursor = 'pointer';
-
-    bunny.on('pointerdown', () => {
-        bunny.eventMode = 'none';
-        sound.stop();
-        console.log('Bunny clicked!');
-        bunny.position.set(100, app.screen.height / 2);
-        sound.play();
-        timeline.restart();
+    bunnyObj.onValuesChange((v) => {
+        bunny.x = v.x;
+        bunny.y = v.y;
+        bunny.rotation = v.rotation;
+        bunny.scale.set(v.scale);
     });
 
-    bunny.on('pointerover', () => {
-        bunny.scale.set(2);
-    });
+    studio.setSelection([bunnyObj]);
 
-    bunny.on('pointerout', () => {
-        bunny.scale.set(1.0);
+    window.addEventListener('keydown', (event) => {
+        // SHIFT + S to save the current state of the project to the console
+        // Copy and paste into animation.json to persist.
+        if (event.key === 'S' && event.shiftKey) {
+            const state = studio.createContentOfSaveFile('My Project');
+            console.log(JSON.stringify(state, null, 4));
+        }
     });
-
-    // Listen for animate update
-    // app.ticker.add((time: Ticker) => {
-    //     bunny.rotation += 0.1 * time.deltaTime;
-    // });
+    app.ticker.start();
+    sheet.sequence.position = 0;
+    await sheet.sequence.play();
 };

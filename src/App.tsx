@@ -35,11 +35,12 @@ function App() {
         // Initialization Function
         const init = async () => {
             const pixiApp = new Application();
-            await pixiApp.init({ background: '#000000' });
+            await pixiApp.init({
+                background: '#000000',
+                autoStart: true,
+            });
 
             if (cancelled) {
-                // Return if the component has been unmounted before initialization is complete.
-                // For example, this happens in strict mode.
                 pixiApp.destroy(true);
                 return;
             }
@@ -48,6 +49,8 @@ function App() {
             containerRef.current?.appendChild(app.canvas);
             app.resizeTo = containerRef.current!;
             bunnyRotate(app);
+            app.render();
+            console.log('DONE');
         };
 
         init();
