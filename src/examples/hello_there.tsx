@@ -89,4 +89,17 @@ export const hello_there = async (app: Application): Promise<void> => {
     app.render();
     sheet.sequence.position = 0;
     await sheet.sequence.play();
+
+    /**
+     * TODO:
+     * Establish tools (move, delete, select, create etc) and a UI for them.
+     * Move pixi instance and theater intance to provider and use redux to manage state of the app.
+     * Establish a way to save the state of the project to a file and load it back in (node server is probably best).
+     *
+     * Future TODO:
+     * Add ability to add new objects to the scene and add them to the theatre project.
+     * Add ability to add new sequences and add them to the theatre project.
+     * Add ability to react to events (click, hover, etc) and trigger sequences based on those events.
+     * Add keyboard events to control screen.
+     */
 };
