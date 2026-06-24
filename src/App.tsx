@@ -2,6 +2,7 @@ import React from 'react';
 import { useEffect, useRef } from 'react';
 import { Application } from 'pixi.js';
 import { bunnyRotate } from './examples/BunnyRotate';
+import './app.scss';
 
 /**
  * I added this component to bring the Pixi.js application into React. This component
@@ -21,11 +22,18 @@ import { bunnyRotate } from './examples/BunnyRotate';
 function App() {
     const containerRef = useRef<HTMLDivElement>(null);
 
+    // The reason for this isPlaying state is autoplay of audio is disabled by
+    // default, so we need to wait for the user to interact with the page before
+    // we can play audio in the animation.
+    const [isPlaying, setIsPlaying] = React.useState(false);
+
     useEffect(() => {
+        if (!isPlaying) {
+            return;
+        }
         if (!containerRef.current) {
             return;
         }
-
         // This is to deal with strict mode where the app can be destroyed before it is fully initialized.
         let cancelled: boolean = false;
 
@@ -48,13 +56,10 @@ function App() {
             app = pixiApp;
             containerRef.current?.appendChild(app.canvas);
             app.resizeTo = containerRef.current!;
-            bunnyRotate(app);
+            await bunnyRotate(app);
             app.render();
-            console.log('DONE');
         };
-
         init();
-
         return () => {
             cancelled = true;
             if (app) {
@@ -62,9 +67,22 @@ function App() {
                 app = null;
             }
         };
-    }, []);
+    }, [isPlaying]);
 
-    return <div ref={containerRef} style={{ position: 'relative', width: '100%', height: '100%' }}></div>;
+    const handlePlay = () => {
+        setIsPlaying(true);
+    };
+
+    return (
+        <>
+            {!isPlaying && (
+                <button className="playButton" onClick={() => handlePlay()}>
+                    Play
+                </button>
+            )}
+            <div ref={containerRef} style={{ position: 'relative', width: '100%', height: '100%' }}></div>
+        </>
+    );
 }
 
 export default App;

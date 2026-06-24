@@ -2,10 +2,9 @@ import { Assets, Application, Sprite, Text } from 'pixi.js';
 import { getProject } from '@theatre/core';
 import studio from '@theatre/studio';
 import animation from './animation.json';
+studio.initialize();
 
 export const bunnyRotate = async (app: Application): Promise<void> => {
-    studio.initialize();
-
     const project = getProject('My Project', {
         state: animation,
     });
@@ -60,6 +59,7 @@ export const bunnyRotate = async (app: Application): Promise<void> => {
         }
     });
     app.ticker.start();
+    app.render();
     sheet.sequence.position = 0;
     await sheet.sequence.play();
 };
