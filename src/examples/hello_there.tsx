@@ -1,5 +1,6 @@
-import { Assets, Application, Sprite, Text } from 'pixi.js';
+import { Assets, Application, Sprite, Graphics, Text, FillGradient } from 'pixi.js';
 import { getProject } from '@theatre/core';
+import { GlowFilter } from 'pixi-filters';
 import studio from '@theatre/studio';
 import helloAnimation from './hello_there.json';
 studio.initialize();
@@ -10,11 +11,36 @@ export const hello_there = async (app: Application): Promise<void> => {
     });
     const sheet = project.sheet('Scene');
 
+    const rect = new Graphics();
+    app.stage.addChild(rect);
+
+    const radialGradient = new FillGradient({
+        type: 'radial',
+        center: { x: 0.5, y: 0.9 },
+        innerRadius: 0,
+        outerCenter: { x: 0.5, y: 0.5 },
+        outerRadius: 0.5,
+        colorStops: [
+            { offset: 0, color: '#330000' }, // Center color
+            { offset: 1, color: 'black' }, // Edge color
+        ],
+        // Use normalized coordinate system where (0,0) is the top-left and (1,1) is the bottom-right of the shape
+        textureSpace: 'local',
+    });
+
+    function drawBackground() {
+        rect.clear();
+        rect.rect(0, 0, app.screen.width, app.screen.height).fill(radialGradient);
+    }
+
+    drawBackground();
+    window.addEventListener('resize', drawBackground);
+
     const texture = await Assets.load('/assets/hello_there.png');
     const hello_there = new Sprite(texture);
-    console.log(hello_there);
+
     app.stage.addChild(hello_there);
-    hello_there.position.set(150, 100);
+    hello_there.position.set(app.screen.width / 2 - hello_there.width / 2, 100);
 
     const textStyle = {
         fontSize: 50,
@@ -29,7 +55,14 @@ export const hello_there = async (app: Application): Promise<void> => {
             text: word[i],
             style: textStyle,
         });
-        letter.position.set(300 + i * 40, app.screen.height / 2);
+        letter.filters = [
+            new GlowFilter({
+                distance: 10,
+                outerStrength: 2,
+                color: 0xff0000,
+            }),
+        ];
+        letter.position.set(app.screen.width / 2 - (word.length * 40) / 2 + i * 40, app.screen.height / 2);
         app.stage.addChild(letter);
         letters.push(letter);
     }
@@ -98,7 +131,7 @@ export const hello_there = async (app: Application): Promise<void> => {
      *
      * Future TODO:
      * Add ability to add new objects to the scene and add them to the theatre project.
-     * Add ability to add new sequences and add them to the theatre project.
+     * Add ability to add new sequences and trigger them in sequence.
      * Add ability to react to events (click, hover, etc) and trigger sequences based on those events.
      * Add keyboard events to control screen.
      */
