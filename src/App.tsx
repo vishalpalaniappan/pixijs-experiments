@@ -2,7 +2,8 @@ import React from 'react';
 import { useEffect, useRef } from 'react';
 import { Application } from 'pixi.js';
 // import { bunnyRotate } from './examples/BunnyRotate';
-import { hello_there } from './examples/hello_there';
+// import { hello_there } from './examples/hello_there';
+import { videoToInteractive } from './examples/videoToInteractive';
 import './app.scss';
 
 /**
@@ -58,7 +59,8 @@ function App() {
             containerRef.current?.appendChild(app.canvas);
             app.resizeTo = containerRef.current!;
             // await bunnyRotate(app);
-            await hello_there(app);
+            // await hello_there(app);
+            await videoToInteractive(app);
             app.render();
         };
         init();
